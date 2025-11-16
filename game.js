@@ -323,32 +323,41 @@ function draw() {
     // Limpiar canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Dibujar indicadores de control (solo si el juego está corriendo)
+    // Dibujar indicadores de control en la parte inferior (solo si el juego está corriendo)
     if (gameRunning) {
-        // Zona de salto (izquierda)
-        ctx.fillStyle = 'rgba(100, 150, 255, 0.1)';
-        ctx.fillRect(0, 0, canvas.width / 2, canvas.height);
+        const controlHeight = canvas.height / 3;
+        const controlY = canvas.height * 2 / 3;
         
-        // Zona de disparo (derecha)
-        ctx.fillStyle = 'rgba(255, 100, 100, 0.1)';
-        ctx.fillRect(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+        // Zona de salto (izquierda inferior)
+        ctx.fillStyle = 'rgba(100, 150, 255, 0.15)';
+        ctx.fillRect(0, controlY, canvas.width / 2, controlHeight);
         
-        // Línea divisoria
+        // Zona de disparo (derecha inferior)
+        ctx.fillStyle = 'rgba(255, 100, 100, 0.15)';
+        ctx.fillRect(canvas.width / 2, controlY, canvas.width / 2, controlHeight);
+        
+        // Línea divisoria vertical
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
         ctx.lineWidth = 2;
         ctx.setLineDash([10, 5]);
         ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, 0);
+        ctx.moveTo(canvas.width / 2, controlY);
         ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+        
+        // Línea horizontal superior
+        ctx.beginPath();
+        ctx.moveTo(0, controlY);
+        ctx.lineTo(canvas.width, controlY);
         ctx.stroke();
         ctx.setLineDash([]);
         
         // Iconos de texto
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.font = 'bold 20px Arial';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = 'bold 18px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('↑ SALTAR', canvas.width / 4, 30);
-        ctx.fillText('💥 DISPARAR', canvas.width * 3 / 4, 30);
+        ctx.fillText('↑ SALTAR', canvas.width / 4, controlY + controlHeight / 2 + 5);
+        ctx.fillText('💥 DISPARAR', canvas.width * 3 / 4, controlY + controlHeight / 2 + 5);
     }
     
     // Dibujar tuberías
@@ -427,12 +436,16 @@ canvas.addEventListener('click', (e) => {
     if (gameRunning) {
         const rect = canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
         
-        // Mitad izquierda: saltar, mitad derecha: disparar
-        if (x < canvas.width / 2) {
-            jump();
-        } else {
-            createBullet();
+        // Solo detectar clics en la parte inferior (último tercio)
+        if (y > canvas.height * 2 / 3) {
+            // Mitad izquierda: saltar, mitad derecha: disparar
+            if (x < canvas.width / 2) {
+                jump();
+            } else {
+                createBullet();
+            }
         }
     }
 });
@@ -444,12 +457,16 @@ canvas.addEventListener('touchstart', (e) => {
         const rect = canvas.getBoundingClientRect();
         const touch = e.touches[0];
         const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
         
-        // Mitad izquierda: saltar, mitad derecha: disparar
-        if (x < canvas.width / 2) {
-            jump();
-        } else {
-            createBullet();
+        // Solo detectar toques en la parte inferior (último tercio)
+        if (y > canvas.height * 2 / 3) {
+            // Mitad izquierda: saltar, mitad derecha: disparar
+            if (x < canvas.width / 2) {
+                jump();
+            } else {
+                createBullet();
+            }
         }
     }
 });
