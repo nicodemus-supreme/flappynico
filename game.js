@@ -323,6 +323,34 @@ function draw() {
     // Limpiar canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
+    // Dibujar indicadores de control (solo si el juego está corriendo)
+    if (gameRunning) {
+        // Zona de salto (izquierda)
+        ctx.fillStyle = 'rgba(100, 150, 255, 0.1)';
+        ctx.fillRect(0, 0, canvas.width / 2, canvas.height);
+        
+        // Zona de disparo (derecha)
+        ctx.fillStyle = 'rgba(255, 100, 100, 0.1)';
+        ctx.fillRect(canvas.width / 2, 0, canvas.width / 2, canvas.height);
+        
+        // Línea divisoria
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([10, 5]);
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Iconos de texto
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('↑ SALTAR', canvas.width / 4, 30);
+        ctx.fillText('💥 DISPARAR', canvas.width * 3 / 4, 30);
+    }
+    
     // Dibujar tuberías
     pipes.forEach(pipe => drawPipe(pipe));
     
@@ -395,9 +423,34 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-canvas.addEventListener('click', () => {
+canvas.addEventListener('click', (e) => {
     if (gameRunning) {
-        jump();
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        
+        // Mitad izquierda: saltar, mitad derecha: disparar
+        if (x < canvas.width / 2) {
+            jump();
+        } else {
+            createBullet();
+        }
+    }
+});
+
+// Eventos táctiles para móvil
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    if (gameRunning) {
+        const rect = canvas.getBoundingClientRect();
+        const touch = e.touches[0];
+        const x = touch.clientX - rect.left;
+        
+        // Mitad izquierda: saltar, mitad derecha: disparar
+        if (x < canvas.width / 2) {
+            jump();
+        } else {
+            createBullet();
+        }
     }
 });
 
